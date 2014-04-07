@@ -47,7 +47,7 @@ namespace Hoa\Database {
  * @license    New BSD License
  */
 
-class DalStatement {
+class DalStatement implements \Hoa\Iterator\Iterator {
 
     /**
      * The statement instance.
@@ -213,6 +213,59 @@ class DalStatement {
     public function errorInfo ( ) {
 
         return $this->getStatement()->errorInfo();
+    }
+
+    // Iterator implementation
+
+
+    /**
+     * Rewind the Iterator to the first element
+     *
+     * @access  public
+     * @return  void
+     */
+    public function rewind() {
+        $this->getStatement()->rewind();
+    }
+
+    /**
+     * Checks if current position is valid
+     *
+     * @access  public
+     * @return  boolean
+     */
+    public function valid() {
+        return $this->getStatement()->valid();
+    }
+
+    /**
+     * Return the current element
+     *
+     * @access  public
+     * @return  mixed
+     */
+    public function current() {
+        return $this->getStatement()->current();
+    }
+
+    /**
+     * Return the key of the current element
+     *
+     * @access  public
+     * @return  mixed
+     */
+    public function key() {
+        return $this->getStatement()->key();
+    }
+
+    /**
+     * Move forward to next element
+     *
+     * @access  public
+     * @return  void
+     */
+    public function next() {
+        $this->getStatement()->next();
     }
 }
 

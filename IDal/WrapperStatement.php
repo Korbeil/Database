@@ -47,7 +47,7 @@ namespace Hoa\Database\IDal {
  * @license    New BSD License
  */
 
-interface WrapperStatement {
+interface WrapperStatement extends \Hoa\Iterator\Iterator {
 
     /**
      * Execute a prepared statement.

@@ -72,6 +72,20 @@ class Statement implements \Hoa\Database\IDal\WrapperStatement {
      */
     protected $_statement = null;
 
+    /**
+     * The iterator cache.
+     *
+     * @var Array object
+     */
+    protected $_cache = Array();
+
+    /**
+     * The current position of the iterator.
+     *
+     * @var Array object
+     */
+    protected $_next = null;
+
 
 
     /**
@@ -163,8 +177,10 @@ class Statement implements \Hoa\Database\IDal\WrapperStatement {
      * @throw   \Hoa\Database\Exception
      */
     public function fetchAll ( ) {
-
-        return $this->getStatement()->fetchAll(\PDO::FETCH_ASSOC);
+        if(count($this->_cache) == 0) {
+            $this->_cache = $this->getStatement()->fetchAll(\PDO::FETCH_ASSOC);
+        }
+        return $this->_cache;
     }
 
     /**
@@ -217,6 +233,81 @@ class Statement implements \Hoa\Database\IDal\WrapperStatement {
     public function errorInfo ( ) {
 
         return $this->getStatement()->errorInfo();
+    }
+
+    // Iterator implementation
+
+
+    /**
+     * Rewind the Iterator to the first element
+     *
+     * @access  public
+     * @return  void
+     */
+    public function rewind( ) {
+
+        reset($this->_cache);
+    }
+
+    /**
+     * Checks if current position is valid
+     *
+     * @access  public
+     * @return  boolean
+     */
+    public function valid( ) {
+
+        return (FALSE !== $this->_next);
+    }
+
+    /**
+     * Return the current element
+     *
+     * @access  public
+     * @return  mixed
+     */
+    public function current( ) {
+
+        return $this->_next[1];
+    }
+
+    /**
+     * Return the key of the current element
+     *
+     * @access  public
+     * @return  mixed
+     */
+    public function key( ) {
+
+        return $this->_next[0];
+    }
+
+    /**
+     * Move forward to next element
+     *
+     * @access  public
+     * @return  void
+     */
+    public function next( ) {
+
+        // Try to get the next element in our data cache.
+        $this->_next = each($this->_cache);
+
+        // Past the end of the data cache
+        if (FALSE === $this->_next)
+        {
+            // Fetch the next row of data
+            $row = $this->getStatement()->fetch(\PDO::FETCH_ASSOC);
+
+            // Fetch successful
+            if ($row)
+            {
+                // Add row to data cache
+                $this->_cache[] = $row;
+            }
+
+            $this->_next = each($this->_cache);
+        }
     }
 }
 
